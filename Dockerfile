@@ -1,20 +1,17 @@
-# Use official Node.js LTS image
 FROM node:18
 
-# Set working directory
 WORKDIR /app
 
-# Copy package files
+# Copy only package.json and package-lock.json first
 COPY package*.json ./
 
-# Install dependencies
+# Install dependencies properly inside the container
 RUN npm install
 
-# Copy source code
+# Then copy the rest of your app
 COPY . .
 
-# Expose the port your app runs on
-EXPOSE 4000
+EXPOSE 3000
 
-# Command to run the app
 CMD ["npm", "start"]
+
