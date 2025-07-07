@@ -12,8 +12,11 @@ spec:
       labels:
         app: node-app
     spec:
+      nodeSelector:
+        node-role: worker   # 👈 This makes sure only worker nodes are used
       containers:
         - name: node-app
           image: sainathmitalakar/my-node-microservice:latest
           ports:
             - containerPort: 4000
+
