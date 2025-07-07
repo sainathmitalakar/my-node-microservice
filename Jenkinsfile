@@ -37,9 +37,15 @@ pipeline {
     stage('Deploy to Kubernetes') {
       steps {
         echo "Deploying to Kubernetes..."
-        sh 'kubectl apply -f kubedeploy/node-deployment.yaml'
-        sh 'kubectl apply -f kubedeploy/node-service.yaml'
+        script {
+          sh '''
+            export KUBECONFIG=/var/lib/jenkins/.kube/config
+            kubectl apply --validate=false -f kubedeploy/node-deployment.yaml
+            kubectl apply --validate=false -f kubedeploy/node-service.yaml
+          '''
+        }
       }
     }
   }
 }
+
