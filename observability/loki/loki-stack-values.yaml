@@ -1,0 +1,8 @@
+loki:
+  enabled: true
+  persistence:
+    enabled: false
+promtail:
+  enabled: true
+grafana:
+  enabled: false
