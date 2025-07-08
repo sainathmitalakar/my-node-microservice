@@ -49,14 +49,38 @@ pipeline {
         echo "📊 Installing Loki Stack via Helm..."
         withEnv(["KUBECONFIG=${KUBECONFIG}"]) {
           sh '''
-            if ! command -v helm &> /dev/null; then
-              echo "Helm not found. Install it first."
-              exit 1
-            fi
             helm repo add grafana https://grafana.github.io/helm-charts
             helm repo update
             helm upgrade --install loki grafana/loki-stack \
               -f observability/loki/loki-stack-values.yaml \
+              -n monitoring --create-namespace
+          '''
+        }
+      }
+    }
+
+    stage('Install Tempo via Helm') {
+      steps {
+        echo "🧪 Installing Tempo via Helm..."
+        withEnv(["KUBECONFIG=${KUBECONFIG}"]) {
+          sh '''
+            helm repo add grafana https://grafana.github.io/helm-charts
+            helm repo update
+            helm upgrade --install tempo grafana/tempo \
+              -f observability/tempo/tempo-values.yaml \
+              -n monitoring --create-namespace
+          '''
+        }
+      }
+    }
+
+    stage('Install Grafana via Helm') {
+      steps {
+        echo "📈 Installing Grafana via Helm..."
+        withEnv(["KUBECONFIG=${KUBECONFIG}"]) {
+          sh '''
+            helm upgrade --install grafana grafana/grafana \
+              --set adminPassword=admin \
               -n monitoring --create-namespace
           '''
         }

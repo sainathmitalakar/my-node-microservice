@@ -1,0 +1,11 @@
+tempo:
+  server:
+    http_listen_port: 3100
+  storage:
+    trace:
+      backend: local
+      local:
+        path: /var/tempo/traces
+  persistence:
+    enabled: true
+    size: 10Gi
