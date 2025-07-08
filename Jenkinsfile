@@ -10,14 +10,14 @@ pipeline {
 
     stage('Clone Repo') {
       steps {
-        echo "Cloning repository..."
+        echo "📥 Cloning repository..."
         checkout scm
       }
     }
 
     stage('Build Docker Image') {
       steps {
-        echo "Building Docker image..."
+        echo "🐳 Building Docker image..."
         script {
           docker.build("${IMAGE_NAME}")
         }
@@ -26,7 +26,7 @@ pipeline {
 
     stage('Push to Docker Hub') {
       steps {
-        echo "Pushing image to Docker Hub..."
+        echo "☁️ Pushing Docker image to Docker Hub..."
         script {
           docker.withRegistry('', 'dockerhub-creds') {
             docker.image("${IMAGE_NAME}").push()
@@ -37,22 +37,22 @@ pipeline {
 
     stage('Deploy Kafka (KRaft Mode)') {
       steps {
-        echo "Deploying Kafka..."
-        script {
-          sh '''
-            export KUBECONFIG=${KUBECONFIG}
-            kubectl apply -f kafka/k8s/kafka-kraft.yaml
-          '''
+        echo "🟡 Deploying Kafka in KRaft mode..."
+        withEnv(["KUBECONFIG=${KUBECONFIG}"]) {
+          sh 'kubectl apply -f kafka/k8s/kafka-kraft.yaml'
         }
       }
     }
 
     stage('Install Loki via Helm') {
       steps {
-        echo "Installing Loki Stack..."
-        script {
+        echo "📊 Installing Loki Stack via Helm..."
+        withEnv(["KUBECONFIG=${KUBECONFIG}"]) {
           sh '''
-            export KUBECONFIG=${KUBECONFIG}
+            if ! command -v helm &> /dev/null; then
+              echo "Helm not found. Install it first."
+              exit 1
+            fi
             helm repo add grafana https://grafana.github.io/helm-charts
             helm repo update
             helm upgrade --install loki grafana/loki-stack \
@@ -63,12 +63,11 @@ pipeline {
       }
     }
 
-    stage('Deploy to Kubernetes') {
+    stage('Deploy Node.js Microservice') {
       steps {
-        echo "Deploying Node.js Microservice to Kubernetes..."
-        script {
+        echo "🚀 Deploying Node.js app to Kubernetes..."
+        withEnv(["KUBECONFIG=${KUBECONFIG}"]) {
           sh '''
-            export KUBECONFIG=${KUBECONFIG}
             kubectl apply --validate=false -f kubedeploy/node-deployment.yaml
             kubectl apply --validate=false -f kubedeploy/node-service.yaml
           '''
@@ -76,5 +75,16 @@ pipeline {
       }
     }
   }
-}
 
+  post {
+    success {
+      echo "✅ Pipeline completed successfully."
+    }
+    failure {
+      echo "❌ Pipeline failed. Check logs for more details."
+    }
+    always {
+      cleanWs()
+    }
+  }
+}
