@@ -1,4 +1,4 @@
-# 🚀 Node.js Microservice CI/CD with Jenkins, Docker, Kubernetes, Terraform, and Observability Stack
+# Node.js Microservice CI/CD with Jenkins, Docker, Kubernetes, Terraform, and Observability Stack
 
 This project showcases a **complete DevOps CI/CD pipeline** for deploying a Node.js microservice using:
 - Jenkins for CI/CD
