@@ -9,7 +9,7 @@ This project showcases a **complete DevOps CI/CD pipeline** for deploying a Node
 - Grafana, Loki, and Tempo for full observability
 
 ---
-## 📁 Folder Structure
+##  Folder Structure
 
 ```
 NodeMicroservice-CICD/
